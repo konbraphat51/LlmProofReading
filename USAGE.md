@@ -5,15 +5,19 @@
 ### 1. Installation
 
 ```bash
+# Install pnpm if not already installed
+npm install -g pnpm
+
+# Install dependencies
 cd app
-npm install
+pnpm install
 ```
 
 ### 2. Configuration
 
 Before using the application, you need to configure your OpenAI API key:
 
-1. Start the development server: `npm run dev`
+1. Start the development server: `pnpm dev`
 2. Open http://localhost:5173 in your browser
 3. Click the **⚙️ Settings** button in the top-right corner
 4. Enter your OpenAI API key (starts with `sk-...`)

@@ -26,20 +26,34 @@ A Grammarly-like GUI for LLM-based proofreading powered by Vue 3 + TypeScript + 
 
 ## Setup
 
-1. Install dependencies:
+1. Install pnpm if not already installed:
 ```bash
-npm install
+npm install -g pnpm
 ```
 
-2. Run development server:
+2. Install dependencies:
 ```bash
-npm run dev
+pnpm install
 ```
 
-3. Build for production:
+3. Run development server:
 ```bash
-npm run build
+pnpm dev
 ```
+
+4. Build for production:
+```bash
+pnpm build
+```
+
+## Prompt Management
+
+All LLM prompts are centrally managed in `src/prompts/`:
+- `prompts/microCorrections.ts` - Sentence-level correction prompts
+- `prompts/macroReview.ts` - Document-level review prompts
+- `prompts/index.ts` - Export hub
+
+For detailed prompt engineering strategy, see [../docs/LLM_STRATEGY.md](../docs/LLM_STRATEGY.md)
 
 ## Usage
 

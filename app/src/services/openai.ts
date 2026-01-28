@@ -1,5 +1,12 @@
 import OpenAI from 'openai';
 import type { Correction, ChatMessage, Settings } from '../types';
+import {
+  getMicroCorrectionsSystemPrompt,
+  getMacroReviewSystemPrompt,
+  getInitialReviewMessage,
+  MICRO_CORRECTIONS_CONFIG,
+  MACRO_REVIEW_CONFIG
+} from '../prompts';
 
 export class OpenAIService {
   private client: OpenAI | null = null;
@@ -19,23 +26,7 @@ export class OpenAIService {
       throw new Error('OpenAI client not initialized');
     }
 
-    const systemPrompt = `You are a professional proofreading assistant. Analyze the following text and identify corrections needed.
-${settings.documentPurpose ? `Document purpose: ${settings.documentPurpose}` : ''}
-${settings.correctionPolicy ? `Correction policy: ${settings.correctionPolicy}` : ''}
-
-Return a JSON array of corrections with this exact format:
-[
-  {
-    "type": "grammar" or "effectiveness",
-    "start": number (character position),
-    "end": number (character position),
-    "original": "original text",
-    "suggestion": "corrected text",
-    "reason": "reason for correction"
-  }
-]
-
-Only return the JSON array, nothing else.`;
+    const systemPrompt = getMicroCorrectionsSystemPrompt(settings);
 
     const response = await this.client.chat.completions.create({
       model: settings.model || 'gpt-4',
@@ -43,7 +34,7 @@ Only return the JSON array, nothing else.`;
         { role: 'system', content: systemPrompt },
         { role: 'user', content: text }
       ],
-      temperature: 0.3
+      temperature: MICRO_CORRECTIONS_CONFIG.temperature
     });
 
     const content = response.choices[0]?.message?.content || '[]';
@@ -70,16 +61,7 @@ Only return the JSON array, nothing else.`;
       throw new Error('OpenAI client not initialized');
     }
 
-    const systemPrompt = `You are a professional editor providing comprehensive document review. Focus on:
-- Overall logical structure
-- Paragraph composition and flow
-- Argumentation and coherence
-- Document-level improvements
-
-${settings.documentPurpose ? `Document purpose: ${settings.documentPurpose}` : ''}
-${settings.correctionPolicy ? `Review policy: ${settings.correctionPolicy}` : ''}
-
-Provide constructive, detailed feedback in a conversational manner.`;
+    const systemPrompt = getMacroReviewSystemPrompt(settings);
 
     const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
       { role: 'system', content: systemPrompt }
@@ -89,7 +71,7 @@ Provide constructive, detailed feedback in a conversational manner.`;
     if (chatHistory.length === 0) {
       messages.push({
         role: 'user',
-        content: `Please review this document:\n\n${text}\n\n${userMessage || 'Please provide a comprehensive review.'}`
+        content: getInitialReviewMessage(text, userMessage)
       });
     } else {
       // Add previous chat history
@@ -109,7 +91,7 @@ Provide constructive, detailed feedback in a conversational manner.`;
     const response = await this.client.chat.completions.create({
       model: settings.model || 'gpt-4',
       messages,
-      temperature: 0.7
+      temperature: MACRO_REVIEW_CONFIG.temperature
     });
 
     return response.choices[0]?.message?.content || 'No response received.';

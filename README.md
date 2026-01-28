@@ -47,11 +47,14 @@ A Grammarly-like GUI for LLM-based proofreading software powered by Vue 3 + Type
 # Navigate to app directory
 cd app
 
+# Install pnpm if not already installed
+npm install -g pnpm
+
 # Install dependencies
-npm install
+pnpm install
 
 # Start development server
-npm run dev
+pnpm dev
 ```
 
 Then open http://localhost:5173 in your browser.
@@ -94,6 +97,10 @@ app/
 │   │   └── useAppState.ts       # Application state management
 │   ├── services/                # External services
 │   │   └── openai.ts            # OpenAI API integration
+│   ├── prompts/                 # LLM prompt templates
+│   │   ├── index.ts             # Export hub
+│   │   ├── microCorrections.ts  # Micro corrections prompts
+│   │   └── macroReview.ts       # Macro review prompts
 │   ├── types/                   # TypeScript types
 │   │   └── index.ts             # Type definitions
 │   ├── i18n/                    # Internationalization
@@ -102,6 +109,7 @@ app/
 │   ├── main.ts                  # Application entry point
 │   └── style.css                # Global styles
 ├── package.json
+├── pnpm-lock.yaml
 └── vite.config.ts
 ```
 
@@ -152,7 +160,7 @@ Each correction includes:
 
 ```bash
 cd app
-npm run build
+pnpm build
 ```
 
 The built files will be in the `app/dist` directory, ready to be deployed to any static hosting service.
@@ -160,24 +168,33 @@ The built files will be in the `app/dist` directory, ready to be deployed to any
 ## Development
 
 ```bash
+# Install pnpm if not already installed
+npm install -g pnpm
+
 # Install dependencies
 cd app
-npm install
+pnpm install
 
 # Run development server with hot reload
-npm run dev
+pnpm dev
 
 # Type-check and build for production
-npm run build
+pnpm build
 
 # Preview production build
-npm run preview
+pnpm preview
 ```
+
+## LLM Prompt Strategy
+
+All LLM prompts are centrally managed in `app/src/prompts/` for easy maintenance and version control.
+
+For detailed information about prompt engineering strategy, temperature settings, and best practices, see [LLM Strategy Documentation](docs/LLM_STRATEGY.md).
 
 ## Requirements
 
 - Node.js 18+ 
-- npm or yarn
+- pnpm (install with `npm install -g pnpm`)
 - OpenAI API key
 
 ## License
